@@ -1,0 +1,6 @@
+- [x] Build ReNu Pain & Wellness homepage from the strategy deck.
+- [x] Use the requested layout in a dark, non-blue green palette.
+- [x] Create a calm movement hero image suggesting a muscle curve or leaves, without anatomical muscle imagery.
+- [x] Verify desktop and mobile presentation.
+- [x] Replace boxy homepage sections with the selected fluid asymmetric dark-green direction.
+- [x] Keep the scheduling notice and verify desktop and mobile presentation.
