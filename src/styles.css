@@ -6,7 +6,8 @@
 
 @theme inline {
   --font-sans: "DM Sans", sans-serif;
-  --font-display: "Fraunces", Georgia, serif;
+  --font-display: "Cormorant", Georgia, serif;
+  --font-logo: "Fraunces", Georgia, serif;
   --radius-sm: calc(var(--radius) - 2px);
   --radius-md: var(--radius);
   --radius-lg: calc(var(--radius) + 2px);

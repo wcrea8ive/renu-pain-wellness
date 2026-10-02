@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ArrowDown, ArrowRight, ArrowUpRight, Menu, X } from "lucide-react";
+import { ArrowDown, ArrowRight, ArrowUpRight, ChevronDown, Menu, X } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 const heroImage = "/hero-1.jpeg";
@@ -26,7 +26,11 @@ const featuredConditions = [
   { name: "Neck pain & headaches", detail: "When tension and discomfort disrupt your day.", image: stretchImage, alt: "Person gently stretching their shoulder", shape: "rounded-tl-[7rem] rounded-tr-[1rem] rounded-b-[7rem]" },
   { name: "Joint & arthritis pain", detail: "When everyday movement feels harder than it should.", image: jointImage, alt: "Hands resting gently on a bent knee", shape: "rounded-t-[7rem] rounded-br-[1rem] rounded-bl-[7rem]" },
 ];
-const otherConditions = ["Nerve pain & sciatica", "Sports & accident injuries", "Pain after surgery"];
+const otherConditions = [
+  { name: "Nerve pain & sciatica", detail: "Sharp, radiating pain that travels down your leg or arm.", image: stretchImage, alt: "Person gently stretching their shoulder", shape: "rounded-tl-[1rem] rounded-tr-[7rem] rounded-b-[7rem]" },
+  { name: "Sports & accident injuries", detail: "Pain from acute injuries that hasn't resolved with rest.", image: jointImage, alt: "Hands resting gently on a bent knee", shape: "rounded-t-[7rem] rounded-bl-[7rem] rounded-br-[1rem]" },
+  { name: "Pain after surgery", detail: "Post-surgical pain that lingers longer than expected.", image: backImage, alt: "Person gently resting their hands against their lower back", shape: "rounded-tl-[7rem] rounded-tr-[1rem] rounded-br-[7rem] rounded-bl-[1rem]" },
+];
 const steps = [
   { number: "01", title: "Listen", detail: "Your full story comes first." },
   { number: "02", title: "Evaluate", detail: "A focused, thoughtful exam." },
@@ -42,6 +46,13 @@ function HomePage() {
   const closeMenu = () => setMenuOpen(false);
   const conditionsRef = useRef<HTMLElement>(null);
   const [conditionsProgress, setConditionsProgress] = useState(0);
+  const [conditionsTranslateY, setConditionsTranslateY] = useState(0);
+  const [conditionsWrapperHeight, setConditionsWrapperHeight] = useState(0);
+  const conditionsSentinelRef = useRef<HTMLDivElement>(null);
+  const conditionsContentRef = useRef<HTMLDivElement>(null);
+  const headerRef = useRef<HTMLElement>(null);
+  const headerBottomRef = useRef(120);
+  const [headerBottom, setHeaderBottom] = useState(120);
   const processRef = useRef<HTMLElement>(null);
   const evaluationRef = useRef<HTMLElement>(null);
   const quoteRef = useRef<HTMLElement>(null);
@@ -50,15 +61,28 @@ function HomePage() {
   useEffect(() => {
     const refs = [conditionsRef, processRef, evaluationRef, quoteRef, scheduleRef];
     const update = () => {
+      const hdr = headerRef.current;
+      const hBottom = hdr ? hdr.offsetTop + hdr.offsetHeight : 120;
+      headerBottomRef.current = hBottom;
+      setHeaderBottom(hBottom);
       refs.forEach(ref => {
         const el = ref.current;
         if (!el) return;
-        const top = Math.min(80, window.innerHeight - el.offsetHeight);
-        el.style.top = `${top}px`;
+        el.style.top = `${hBottom}px`;
       });
     };
     update();
     window.addEventListener('resize', update);
+
+    const measureWrapper = () => {
+      const content = conditionsContentRef.current;
+      if (content) setConditionsWrapperHeight(content.offsetHeight);
+    };
+    measureWrapper();
+    const ro = new ResizeObserver(measureWrapper);
+    if (conditionsContentRef.current) ro.observe(conditionsContentRef.current);
+    // Also remeasure on image load (images shift layout after mount)
+    conditionsRef.current?.querySelectorAll('img').forEach(img => img.addEventListener('load', measureWrapper));
 
     const handleScroll = () => {
       const el = conditionsRef.current;
@@ -66,6 +90,15 @@ function HomePage() {
       const rect = el.getBoundingClientRect();
       const progress = Math.max(0, Math.min(1, (window.innerHeight - rect.top) / window.innerHeight));
       setConditionsProgress(progress);
+
+      const sentinel = conditionsSentinelRef.current;
+      if (sentinel) {
+        const stickyTop = headerBottomRef.current;
+        const scrollPast = Math.max(0, stickyTop - sentinel.getBoundingClientRect().top);
+        const contentH = conditionsContentRef.current?.offsetHeight ?? el.scrollHeight;
+        const maxScroll = Math.max(0, contentH - el.offsetHeight);
+        setConditionsTranslateY(Math.min(scrollPast, maxScroll));
+      }
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
     handleScroll();
@@ -73,18 +106,27 @@ function HomePage() {
     return () => {
       window.removeEventListener('resize', update);
       window.removeEventListener('scroll', handleScroll);
+      ro.disconnect();
     };
   }, []);
 
   return (
-    <div className={`page-root min-h-screen bg-background text-foreground ${version !== 3 ? "overflow-hidden" : ""}`} data-theme={version >= 2 ? "v2" : undefined}>
-      <header className="sticky top-0 z-30 bg-background/80 backdrop-blur-md">
-        <div className="mx-auto grid h-20 max-w-7xl grid-cols-[minmax(0,1fr)_auto] items-center gap-6 px-6 lg:flex lg:justify-between lg:px-10">
-          <a href="#top" onClick={closeMenu} className="flex min-w-0 items-center gap-3" aria-label="ReNu Pain & Wellness home">
-            <span className="font-display text-3xl font-semibold leading-none text-foreground">ReNu<span className="text-primary">.</span></span>
+    <div className={`page-root min-h-screen bg-background text-foreground ${version !== 3 ? "overflow-hidden" : ""}`} data-theme={version >= 2 ? "v2" : undefined} data-version={version}>
+      <div className="sticky top-0 z-50 flex justify-end gap-1 bg-background/80 px-5 py-1.5 backdrop-blur-md">
+        {([1, 2, 3] as const).map(v => (
+          <button key={v} onClick={() => setVersion(v)} className={`h-7 rounded-full border px-4 text-[10px] font-semibold uppercase backdrop-blur transition-colors ${version === v ? "border-primary bg-primary text-primary-foreground" : "border-border bg-background/80 text-muted-foreground hover:text-foreground"}`}>V{v}</button>
+        ))}
+      </div>
+      <header ref={headerRef} className="sticky top-[40px] z-30 bg-background/80 backdrop-blur-md">
+        <div className={`grid h-20 w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-6 lg:flex lg:justify-between ${version === 3 ? "px-5" : "px-3 sm:px-6 lg:px-10"}`}>
+          <a href="#top" onClick={closeMenu} className={`flex min-w-0 items-center gap-3 ${version !== 3 ? "ml-[50px]" : ""}`} aria-label="ReNu Pain & Wellness home">
+            <span className="font-logo text-3xl font-semibold leading-none text-foreground">ReNu<span className="text-primary">.</span></span>
             <span className="hidden border-l border-border pl-3 text-[10px] font-semibold uppercase leading-[1.4] text-muted-foreground sm:block">Pain &<br />Wellness</span>
           </a>
           <nav className="hidden items-center gap-8 text-xs font-medium uppercase text-muted-foreground lg:flex" aria-label="Main navigation">
+            <a className="transition-colors hover:text-foreground" href="#">About Us</a>
+            <a className="transition-colors hover:text-foreground" href="#">Patient Info</a>
+            <a className="transition-colors hover:text-foreground" href="#">Treatments</a>
             <a className="transition-colors hover:text-foreground" href="#conditions">Who we help</a>
             <a className="transition-colors hover:text-foreground" href="#services">Services</a>
             <a className="transition-colors hover:text-foreground" href="#process">Our approach</a>
@@ -107,6 +149,9 @@ function HomePage() {
           <Button variant="subtle" size="icon" className="shrink-0 rounded-full lg:hidden" onClick={() => setMenuOpen(!menuOpen)} aria-label={menuOpen ? "Close menu" : "Open menu"} aria-expanded={menuOpen}>{menuOpen ? <X /> : <Menu />}</Button>
         </div>
         {menuOpen && <nav className="flex flex-col gap-1 border-t border-border bg-background px-6 py-5 text-sm lg:hidden" aria-label="Mobile navigation">
+          <a onClick={closeMenu} className="py-3" href="#">About Us</a>
+          <a onClick={closeMenu} className="py-3" href="#">Patient Info</a>
+          <a onClick={closeMenu} className="py-3" href="#">Treatments</a>
           <a onClick={closeMenu} className="py-3" href="#conditions">Who we help</a>
           <a onClick={closeMenu} className="py-3" href="#services">Services</a>
           <a onClick={closeMenu} className="py-3" href="#process">Our approach</a>
@@ -115,11 +160,6 @@ function HomePage() {
         </nav>}
       </header>
 
-      <div className="fixed top-5 right-5 z-50 flex gap-1">
-        {([1, 2, 3] as const).map(v => (
-          <button key={v} onClick={() => setVersion(v)} className={`h-8 rounded-full border px-4 text-[10px] font-semibold uppercase backdrop-blur transition-colors ${version === v ? "border-primary bg-primary text-primary-foreground" : "border-border bg-background/80 text-muted-foreground hover:text-foreground"}`}>V{v}</button>
-        ))}
-      </div>
 
       <main id="top">
         <div className={version === 3 ? "px-5" : "px-3 sm:px-6 lg:px-10"} style={version === 3 ? { position: 'sticky', top: 0, zIndex: 0 } : undefined}>
@@ -129,10 +169,19 @@ function HomePage() {
             <img src={heroImage} alt="A wide field of green leaves in soft morning light" width={1920} height={1088} fetchPriority="high" className="absolute inset-0 h-full w-full object-cover object-center hero-ken-burns" />
             <div className="hero-shade absolute inset-0" aria-hidden="true" />
             <div className="relative z-10 w-full px-7 py-20 sm:px-12 lg:px-24">
-              <div className="max-w-[680px]">
+              <div className="max-w-[750px]">
                 <p className="mb-8 text-xs font-semibold uppercase text-kicker">The right path out of pain</p>
-                <h1 className="font-display text-[clamp(2rem,6.5vw,5.75rem)] font-normal leading-[1.06] text-hero-foreground"><span className="block whitespace-nowrap">Understand your pain.</span><em className="block font-normal text-primary">Find the right way forward.</em></h1>
-                <p className="mt-8 max-w-[480px] text-base leading-relaxed text-hero-muted md:text-lg">Personalized pain care that starts with an accurate evaluation — so your next step feels clear, not uncertain.</p>
+                {version === 3 ? (
+                  <>
+                    <h1 className="font-display text-[clamp(1.6rem,4.5vw,4rem)] font-normal leading-[1.1] text-hero-foreground"><span className="block">Advanced interventional care. A whole-person approach.</span></h1>
+                    <p className="mt-8 max-w-[520px] text-base leading-relaxed text-hero-muted md:text-lg">Dr. Razi and the ReNu Pain & Wellness team don't guess. They start with a thorough evaluation, identify the source, and build a plan that fits your life.</p>
+                  </>
+                ) : (
+                  <>
+                    <h1 className="font-display text-[clamp(2rem,6.5vw,5.75rem)] font-normal leading-[1.06] text-hero-foreground"><span className="block whitespace-nowrap">Understand your pain.</span><em className="block font-normal text-primary">Find the right way forward.</em></h1>
+                    <p className="mt-8 max-w-[480px] text-base leading-relaxed text-hero-muted md:text-lg">Personalized pain care that starts with an accurate evaluation — so your next step feels clear, not uncertain.</p>
+                  </>
+                )}
                 <div className="mt-9 flex flex-wrap items-center gap-6">
                   <Button asChild variant="hero" size="lg" className="h-14 rounded-full px-7 text-xs font-semibold uppercase"><a href="#schedule">Schedule a Pain Evaluation <ArrowUpRight /></a></Button>
                 </div>
@@ -145,13 +194,13 @@ function HomePage() {
 
         <div className="relative z-10 bg-background">
         {version !== 3 ? (
-          <section className="sticky top-20 z-0 bg-background mx-auto max-w-[1600px] px-6 pt-16 pb-20 sm:px-10 md:pt-24 md:pb-28 lg:px-16 text-center">
+          <section className="bg-background mx-auto max-w-[1600px] px-6 pt-16 pb-20 sm:px-10 md:pt-24 md:pb-28 lg:px-16 text-center">
             <p className="font-display text-[clamp(1.6rem,4vw,3.5rem)] leading-[1.15] font-normal">Pain is personal.</p>
             <p className="font-display text-[clamp(1.6rem,4vw,3.5rem)] leading-[1.15] font-normal">Your care should be too.</p>
             <p className="font-display text-[clamp(1.6rem,4vw,3.5rem)] leading-[1.15] font-normal"><em className="text-primary">We start by listening.</em></p>
           </section>
         ) : (
-          <section className="sticky top-20 z-0 bg-background mx-auto max-w-[1600px] px-6 pt-16 pb-20 sm:px-10 md:pt-24 md:pb-28 lg:px-16">
+          <section className="bg-background mx-auto max-w-[1600px] px-6 pt-16 pb-20 sm:px-10 md:pt-24 md:pb-28 lg:px-16">
             <div className="grid gap-12 lg:grid-cols-2 lg:gap-20 lg:items-center">
               <div className="relative aspect-[3/4] max-h-[432px] w-full max-w-[324px] overflow-hidden rounded-[2rem] bg-secondary ml-[300px]">
                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-muted-foreground">
@@ -161,17 +210,21 @@ function HomePage() {
               </div>
               <div>
                 <p className="mb-6 text-[11px] font-semibold uppercase text-kicker">Meet your doctor</p>
-                <h2 className="mb-6 font-display text-4xl leading-tight md:text-6xl">Dr. Razi</h2>
-                <p className="text-base leading-8 text-muted-foreground">An anesthesiology and pain management specialist dedicated to helping patients find meaningful relief from chronic pain. My approach combines advanced treatment options with personalized, whole-person care focused on restoring function and improving quality of life. I look forward to helping you move toward a healthier, more comfortable future.</p>
+                <h2 className="mb-6 font-display text-4xl leading-tight md:text-6xl">Toufan Razi,<span className="text-[0.7em]">MD</span></h2>
+                <p className="text-base leading-8 text-muted-foreground">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                <p className="mt-4 text-base leading-8 text-muted-foreground">An anesthesiology and pain management specialist dedicated to helping patients find meaningful relief from chronic pain. My approach combines advanced treatment options with personalized, whole-person care focused on restoring function and improving quality of life. I look forward to helping you move toward a healthier, more comfortable future.</p>
               </div>
             </div>
           </section>
         )}
 
-        <section ref={conditionsRef} id="conditions" className="sticky z-10 scroll-mt-20 py-16 md:py-24 mt-8 rounded-t-[2.5rem]" style={{ backgroundColor: "#E8F2EB" }}>
-          <div className="mx-auto max-w-7xl px-6 lg:px-10">
+        <div className="mt-8" style={{ height: conditionsWrapperHeight > 0 ? `${conditionsWrapperHeight}px` : undefined }}>
+          <div ref={conditionsSentinelRef} />
+        <section ref={conditionsRef} id="conditions" className="sticky z-10 rounded-t-[2.5rem] overflow-hidden" style={{ backgroundColor: "#E8F2EB", height: `calc(100vh - ${headerBottom}px)` }}>
+          <div ref={conditionsContentRef} style={{ transform: `translateY(${-conditionsTranslateY}px)`, willChange: 'transform' }}>
+          <div className="mx-auto max-w-7xl px-6 py-16 lg:px-10 md:py-24">
             <div className="mb-12 flex flex-col justify-between gap-7 md:mb-16 md:flex-row md:items-end">
-              <div><p className="mb-5 text-[11px] font-semibold uppercase text-kicker">01 — Who we help</p><h2 className="max-w-2xl font-display text-4xl leading-tight md:text-6xl" style={version === 1 ? { color: '#1D5B57' } : undefined}>Care that begins with <em className="text-primary">your experience.</em></h2></div>
+              <div><p className="mb-5 text-[11px] font-semibold uppercase text-kicker">01 — Who we help</p><h2 className="max-w-2xl font-display text-4xl leading-tight md:text-6xl" style={version === 1 ? { color: '#1D5B57' } : undefined}>Care that begins with<br /><em className="text-primary">your experience.</em></h2></div>
               {version !== 3 && <p className="max-w-sm text-sm leading-7 text-muted-foreground">Pain is personal. We begin with what you're feeling, how it affects your life, and what you want to get back to.</p>}
             </div>
             <div className="grid gap-12 md:grid-cols-3 md:gap-8 lg:gap-12">
@@ -180,13 +233,15 @@ function HomePage() {
                   <div className={`pointer-events-none absolute inset-0 z-10 translate-x-5 translate-y-5 border border-white/60 ${item.shape}`} />
                   <div className={`aspect-[4/4.8] overflow-hidden bg-secondary ${item.shape}`}><img src={item.image} alt={item.alt} width={912} height={1104} loading="lazy" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105 motion-reduce:transition-none" /></div>
                 </div>
-                <div className="mt-6 flex items-start justify-between gap-4"><div><h3 className="font-display text-2xl md:text-3xl" style={version === 1 ? { color: '#1D5B57' } : undefined}>{item.name}</h3><p className="mt-2 text-sm leading-6 text-muted-foreground">{item.detail}</p></div><ArrowUpRight className="mt-1 size-5 shrink-0 text-primary transition-transform group-hover:-translate-y-1 group-hover:translate-x-1" /></div>
+                <div className="mt-6"><h3 className="font-display text-2xl md:text-3xl" style={version === 1 ? { color: '#1D5B57' } : undefined}>{item.name}</h3><p className="mt-2 text-sm leading-6 text-muted-foreground">{item.detail}</p>{version === 3 && <p className="mt-3 text-xs font-semibold uppercase text-primary">Learn more</p>}</div>
                 <span className="mt-6 block h-px w-14 bg-primary transition-[width] duration-500 group-hover:w-full motion-reduce:transition-none" />
               </a>)}
             </div>
-            <div className="mt-14 grid gap-x-16 md:mt-20 md:grid-cols-3">{otherConditions.map((name) => <a key={name} href="#evaluation" className="group flex items-center justify-between gap-4 border-b border-border py-6 font-display text-xl transition-colors hover:text-primary sm:text-2xl" style={version === 1 ? { color: '#1D5B57' } : undefined}>{name}<ArrowUpRight className="size-5 shrink-0 text-primary" /></a>)}</div>
+            <div className="mt-14 grid gap-x-10 gap-y-12 md:mt-20 md:grid-cols-3">{otherConditions.map((item) => <a key={item.name} href="#evaluation" className="group block min-w-0"><div className="relative"><div className={`pointer-events-none absolute inset-0 z-10 translate-x-5 translate-y-5 border border-white/60 ${item.shape}`} /><div className={`aspect-[4/4.8] overflow-hidden bg-secondary ${item.shape}`}><img src={item.image} alt={item.alt} className="h-full w-full object-cover object-center transition-transform duration-700 group-hover:scale-105" /></div></div><div className="mt-6"><p className="font-display text-xl sm:text-2xl" style={version === 1 ? { color: '#1D5B57' } : undefined}>{item.name}</p><p className="mt-2 text-sm leading-6 text-muted-foreground">{item.detail}</p><p className="mt-3 text-xs font-semibold uppercase text-primary">Learn more</p></div></a>)}</div>
+          </div>
           </div>
         </section>
+        </div>
 
         <section ref={processRef} id="process" className="sticky z-20 scroll-mt-20 bg-secondary py-24 md:py-32">
           <div className="mx-auto max-w-7xl px-6 lg:px-10">
@@ -213,7 +268,7 @@ function HomePage() {
         <section ref={scheduleRef} id="schedule" className="sticky z-50 scroll-mt-20 bg-background py-24 md:py-32"><div className="mx-auto flex max-w-7xl flex-col justify-between gap-10 px-6 md:flex-row md:items-end lg:px-10"><div><p className="mb-5 text-[11px] font-semibold uppercase text-kicker">04 — Your next step</p><h2 className="max-w-2xl font-display text-4xl leading-tight md:text-6xl">The way forward starts <em className="text-primary">with clarity.</em></h2><p className="mt-6 max-w-xl text-sm leading-7 text-muted-foreground">We're designing a more helpful first step. Appointment booking and insurance details will be available here when confirmed by ReNu.</p></div><div className="shrink-0 border-t border-border pt-6 text-sm text-muted-foreground md:max-w-[250px]"><span className="mb-2 block text-xs font-semibold uppercase text-kicker">Coming soon</span>Online scheduling for the Pain Clarity Evaluation.</div></div></section>
         </div>{/* end sticky overlay wrapper */}
       </main>
-      <footer className="bg-secondary"><div className="mx-auto flex max-w-7xl flex-col justify-between gap-6 px-6 py-10 sm:flex-row sm:items-end lg:px-10"><div><a href="#top" className="font-display text-3xl font-semibold">ReNu<span className="text-primary">.</span></a><p className="mt-2 text-xs uppercase text-muted-foreground">Pain & Wellness</p></div><p className="text-xs text-muted-foreground">Understand your pain. Find the right way forward.</p></div></footer>
+      <footer className="bg-secondary"><div className="mx-auto flex max-w-7xl flex-col justify-between gap-6 px-6 py-10 sm:flex-row sm:items-end lg:px-10"><div><a href="#top" className="font-logo text-3xl font-semibold">ReNu<span className="text-primary">.</span></a><p className="mt-2 text-xs uppercase text-muted-foreground">Pain & Wellness</p></div><p className="text-xs text-muted-foreground">Understand your pain. Find the right way forward.</p></div></footer>
     </div>
   );
 }
