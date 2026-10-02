@@ -17,6 +17,7 @@ export const Route = createFileRoute("/")({
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
+
   }),
   component: HomePage,
 });
@@ -157,7 +158,7 @@ function HomePage() {
             <div className="hero-shade absolute inset-0" aria-hidden="true" />
             <div className="relative z-10 w-full px-7 py-20 sm:px-12 lg:px-24">
               <div className="max-w-[750px]">
-                <p className="mb-8 text-xs font-semibold uppercase text-kicker">The right path out of pain</p>
+                <p className="mb-8 text-[16px] font-semibold uppercase text-kicker">The right path out of pain</p>
                 {version === 3 ? (
                   <>
                     <h1 className="font-display text-[clamp(1.6rem,4.5vw,4rem)] font-normal leading-[1.1] text-hero-foreground"><span className="block">Advanced interventional care. A whole-person approach.</span></h1>
@@ -188,18 +189,18 @@ function HomePage() {
           </section>
         ) : (
           <section className="sticky z-[1] bg-background mx-auto max-w-[1600px] px-6 pt-16 pb-20 sm:px-10 md:pt-24 md:pb-28 lg:px-16" style={{ top: `${headerBottom}px` }}>
-            <div className="grid gap-12 lg:grid-cols-2 lg:gap-20 lg:items-center">
-              <div className="relative aspect-[3/4] max-h-[432px] w-full max-w-[324px] overflow-hidden rounded-[2rem] bg-secondary ml-[300px]">
-                <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-muted-foreground">
-                  <svg className="size-16 opacity-30" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
-                  <span className="text-xs uppercase tracking-widest opacity-40">Doctor photo</span>
-                </div>
+            <div className="grid lg:grid-cols-2 lg:items-center" style={{ gap: '50px', transform: 'translateX(-150px)' }}>
+              <div className="relative aspect-[3/4] max-h-[432px] w-full max-w-[324px] overflow-hidden rounded-[2rem] ml-auto" style={{ backgroundColor: '#7ba68a' }}>
+                <img src="/dr-toufan-razi.png" alt="Dr. Toufan Razi, MD" className="absolute inset-0 h-full w-full object-cover object-top" />
               </div>
               <div>
-                <p className="mb-6 text-[11px] font-semibold uppercase text-kicker">Meet your doctor</p>
-                <h2 className="mb-6 font-display text-4xl leading-tight md:text-6xl">Toufan Razi,<span className="text-[0.7em]">MD</span></h2>
-                <p className="text-base leading-8 text-muted-foreground">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
-                <p className="mt-4 text-base leading-8 text-muted-foreground">An anesthesiology and pain management specialist dedicated to helping patients find meaningful relief from chronic pain. My approach combines advanced treatment options with personalized, whole-person care focused on restoring function and improving quality of life. I look forward to helping you move toward a healthier, more comfortable future.</p>
+                <p className="mb-6 text-[16px] font-semibold uppercase text-kicker">Welcome to ReNu Pain &amp; Wellness</p>
+                <h2 className="mb-8 font-display text-4xl leading-tight md:text-6xl">Toufan Razi,<span className="text-[0.7em]">MD</span></h2>
+                <blockquote className="font-display text-xl italic leading-9 text-foreground md:text-2xl">"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."</blockquote>
+                <p className="mt-5 text-sm leading-7 text-muted-foreground">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat duis aute irure dolor.</p>
+                <div className="mt-8">
+                  <img src="/signature.png" alt="Dr. Toufan Razi signature" className="h-16 w-auto" />
+                </div>
               </div>
             </div>
           </section>
@@ -208,7 +209,7 @@ function HomePage() {
         <section ref={conditionsRef} id="conditions" className="sticky z-10 rounded-t-[2.5rem]" style={{ backgroundColor: "#E8F2EB", top: conditionsStickyTop !== null ? `${conditionsStickyTop}px` : undefined }}>
           <div className="mx-auto max-w-7xl px-6 py-16 lg:px-10 md:py-24">
             <div className="mb-12 flex flex-col justify-between gap-7 md:mb-16 md:flex-row md:items-end">
-              <div><p className="mb-5 text-[11px] font-semibold uppercase text-kicker">01 — Who we help</p><h2 className="max-w-2xl font-display text-4xl leading-tight md:text-6xl" style={version === 1 ? { color: '#1D5B57' } : undefined}>Care that begins with<br /><em className="text-primary">your experience.</em></h2></div>
+              <div><p className="mb-5 text-[16px] font-semibold uppercase text-kicker">Our Services</p><h2 className="font-display text-4xl leading-tight md:text-6xl whitespace-nowrap" style={version === 1 ? { color: '#1D5B57' } : undefined}>Care that begins with <em className="text-primary">your experience.</em></h2></div>
               {version !== 3 && <p className="max-w-sm text-sm leading-7 text-muted-foreground">Pain is personal. We begin with what you're feeling, how it affects your life, and what you want to get back to.</p>}
             </div>
             <div className="grid gap-12 md:grid-cols-3 md:gap-8 lg:gap-12">
@@ -221,13 +222,16 @@ function HomePage() {
                 <span className="mt-6 block h-px w-14 bg-primary transition-[width] duration-500 group-hover:w-full motion-reduce:transition-none" />
               </a>)}
             </div>
-            <div className="mt-14 grid gap-x-10 gap-y-12 md:mt-20 md:grid-cols-3">{otherConditions.map((item) => <a key={item.name} href="#evaluation" className="group block min-w-0"><div className="relative"><div className={`pointer-events-none absolute inset-0 z-10 translate-x-5 translate-y-5 border border-white/60 ${item.shape}`} /><div className={`aspect-[4/4.8] overflow-hidden bg-secondary ${item.shape}`}><img src={item.image} alt={item.alt} className="h-full w-full object-cover object-center transition-transform duration-700 group-hover:scale-105" /></div></div><div className="mt-6"><p className="font-display text-xl sm:text-2xl" style={version === 1 ? { color: '#1D5B57' } : undefined}>{item.name}</p><p className="mt-2 text-sm leading-6 text-muted-foreground">{item.detail}</p><p className="mt-3 text-xs font-semibold uppercase text-primary">Learn more</p></div></a>)}</div>
+            <div className="mt-14 grid gap-x-10 gap-y-12 md:mt-20 md:grid-cols-3">{otherConditions.map((item, index) => <a key={item.name} href="#evaluation" className="group block min-w-0" style={index === 1 ? { paddingTop: '60px' } : undefined}><div className="relative"><div className={`pointer-events-none absolute inset-0 z-10 translate-x-5 translate-y-5 border border-white/60 ${item.shape}`} /><div className={`aspect-[4/4.8] overflow-hidden bg-secondary ${item.shape}`}><img src={item.image} alt={item.alt} className="h-full w-full object-cover object-center transition-transform duration-700 group-hover:scale-105" /></div></div><div className="mt-6"><p className="font-display text-xl sm:text-2xl" style={version === 1 ? { color: '#1D5B57' } : undefined}>{item.name}</p><p className="mt-2 text-sm leading-6 text-muted-foreground">{item.detail}</p><p className="mt-3 text-xs font-semibold uppercase text-primary">Learn more</p></div></a>)}</div>
+            <div className="mt-14 flex justify-center md:mt-20">
+              <Button asChild variant="subtle" size="lg" className="h-12 rounded-full px-8 text-xs uppercase"><a href="#services">View All Services <ArrowRight /></a></Button>
+            </div>
           </div>
         </section>
 
         <section ref={processRef} id="process" className="sticky z-20 scroll-mt-20 bg-secondary py-24 md:py-32">
           <div className="mx-auto max-w-7xl px-6 lg:px-10">
-            <div className="flex flex-col justify-between gap-8 md:flex-row md:items-end"><div><p className="mb-5 text-[11px] font-semibold uppercase text-kicker">02 — The ReNu care pathway</p><h2 className="max-w-2xl font-display text-4xl leading-tight md:text-6xl">A thoughtful process.<br /><em className="text-primary">A clearer direction.</em></h2></div><p className="max-w-sm text-sm leading-7 text-muted-foreground">Good care is not a list of treatments. It's a sequence of decisions made with you, and adjusted as you go.</p></div>
+            <div className="flex flex-col justify-between gap-8 md:flex-row md:items-end"><div><p className="mb-5 text-[16px] font-semibold uppercase text-kicker">02 — The ReNu care pathway</p><h2 className="max-w-2xl font-display text-4xl leading-tight md:text-6xl">A thoughtful process.<br /><em className="text-primary">A clearer direction.</em></h2></div><p className="max-w-sm text-sm leading-7 text-muted-foreground">Good care is not a list of treatments. It's a sequence of decisions made with you, and adjusted as you go.</p></div>
             <div className="mt-16 grid gap-x-8 gap-y-12 md:grid-cols-3 lg:grid-cols-6">
               {steps.map((step) => <div key={step.number} className="min-w-0"><span className="font-display text-4xl italic text-primary/75">{step.number}</span><h3 className="mt-5 font-display text-2xl">{step.title}</h3><p className="mt-3 max-w-[150px] text-sm leading-6 text-muted-foreground">{step.detail}</p></div>)}
             </div>
@@ -236,8 +240,8 @@ function HomePage() {
 
         <section ref={evaluationRef} id="evaluation" className="sticky z-30 scroll-mt-20 bg-background py-24 md:py-32">
           <div className="mx-auto grid max-w-7xl gap-14 px-6 lg:grid-cols-[0.9fr_1.1fr] lg:gap-24 lg:px-10">
-            <div><p className="mb-5 text-[11px] font-semibold uppercase text-kicker">03 — Your first visit</p><h2 className="font-display text-4xl leading-tight md:text-6xl">The Pain Clarity <em className="text-primary">Evaluation.</em></h2><p className="mt-7 max-w-md text-base leading-8 text-muted-foreground">A first visit with a clear purpose: to understand the likely source of your pain and help you make an informed decision about what comes next.</p><Button asChild variant="subtle" size="lg" className="mt-9 h-12 rounded-full px-6 text-xs uppercase"><a href="#schedule">Plan your first visit <ArrowRight /></a></Button></div>
-            <div className="border-t border-border"><p className="py-5 text-xs font-semibold uppercase text-kicker">You can expect to leave with</p>{[
+            <div><p className="mb-5 text-[16px] font-semibold uppercase text-kicker">03 — Your first visit</p><h2 className="font-display text-4xl leading-tight md:text-6xl">The Pain Clarity <em className="text-primary">Evaluation.</em></h2><p className="mt-7 max-w-md text-base leading-8 text-muted-foreground">A first visit with a clear purpose: to understand the likely source of your pain and help you make an informed decision about what comes next.</p><Button asChild variant="subtle" size="lg" className="mt-9 h-12 rounded-full px-6 text-xs uppercase"><a href="#schedule">Plan your first visit <ArrowRight /></a></Button></div>
+            <div className="border-t border-border"><p className="py-5 text-[16px] font-semibold uppercase text-kicker">You can expect to leave with</p>{[
               ["01", "A clearer understanding", "An explanation of the likely source of your pain."],
               ["02", "Options that make sense", "Appropriate next steps explained without pressure."],
               ["03", "A recommended direction", "A care roadmap, in writing when appropriate."],
@@ -245,9 +249,9 @@ function HomePage() {
           </div>
         </section>
 
-        <section ref={quoteRef} className="sticky z-40 bg-secondary py-20 md:py-24"><div className="mx-auto max-w-7xl px-6 lg:px-10"><p className="mb-7 text-[11px] font-semibold uppercase text-kicker">Our point of view</p><blockquote className="max-w-5xl font-display text-3xl leading-snug md:text-5xl">“The first step toward feeling better is understanding what you're dealing with.”</blockquote><p className="mt-7 text-sm text-muted-foreground">Clarity, guidance, and care without pressure.</p></div></section>
+        <section ref={quoteRef} className="sticky z-40 bg-secondary py-20 md:py-24"><div className="mx-auto max-w-7xl px-6 lg:px-10"><p className="mb-7 text-[16px] font-semibold uppercase text-kicker">Our point of view</p><blockquote className="max-w-5xl font-display text-3xl leading-snug md:text-5xl">“The first step toward feeling better is understanding what you're dealing with.”</blockquote><p className="mt-7 text-sm text-muted-foreground">Clarity, guidance, and care without pressure.</p></div></section>
 
-        <section ref={scheduleRef} id="schedule" className="sticky z-50 scroll-mt-20 bg-background py-24 md:py-32"><div className="mx-auto flex max-w-7xl flex-col justify-between gap-10 px-6 md:flex-row md:items-end lg:px-10"><div><p className="mb-5 text-[11px] font-semibold uppercase text-kicker">04 — Your next step</p><h2 className="max-w-2xl font-display text-4xl leading-tight md:text-6xl">The way forward starts <em className="text-primary">with clarity.</em></h2><p className="mt-6 max-w-xl text-sm leading-7 text-muted-foreground">We're designing a more helpful first step. Appointment booking and insurance details will be available here when confirmed by ReNu.</p></div><div className="shrink-0 border-t border-border pt-6 text-sm text-muted-foreground md:max-w-[250px]"><span className="mb-2 block text-xs font-semibold uppercase text-kicker">Coming soon</span>Online scheduling for the Pain Clarity Evaluation.</div></div></section>
+        <section ref={scheduleRef} id="schedule" className="sticky z-50 scroll-mt-20 bg-background py-24 md:py-32"><div className="mx-auto flex max-w-7xl flex-col justify-between gap-10 px-6 md:flex-row md:items-end lg:px-10"><div><p className="mb-5 text-[16px] font-semibold uppercase text-kicker">04 — Your next step</p><h2 className="max-w-2xl font-display text-4xl leading-tight md:text-6xl">The way forward starts <em className="text-primary">with clarity.</em></h2><p className="mt-6 max-w-xl text-sm leading-7 text-muted-foreground">We're designing a more helpful first step. Appointment booking and insurance details will be available here when confirmed by ReNu.</p></div><div className="shrink-0 border-t border-border pt-6 text-sm text-muted-foreground md:max-w-[250px]"><span className="mb-2 block text-[16px] font-semibold uppercase text-kicker">Coming soon</span>Online scheduling for the Pain Clarity Evaluation.</div></div></section>
         </div>{/* end sticky overlay wrapper */}
       </main>
       <footer className="bg-secondary"><div className="mx-auto flex max-w-7xl flex-col justify-between gap-6 px-6 py-10 sm:flex-row sm:items-end lg:px-10"><div><a href="#top" className="font-logo text-3xl font-semibold">ReNu<span className="text-primary">.</span></a><p className="mt-2 text-xs uppercase text-muted-foreground">Pain & Wellness</p></div><p className="text-xs text-muted-foreground">Understand your pain. Find the right way forward.</p></div></footer>
