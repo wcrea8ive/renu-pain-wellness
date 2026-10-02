@@ -46,10 +46,7 @@ function HomePage() {
   const closeMenu = () => setMenuOpen(false);
   const conditionsRef = useRef<HTMLElement>(null);
   const [conditionsProgress, setConditionsProgress] = useState(0);
-  const [conditionsTranslateY, setConditionsTranslateY] = useState(0);
-  const [conditionsWrapperHeight, setConditionsWrapperHeight] = useState(0);
-  const conditionsSentinelRef = useRef<HTMLDivElement>(null);
-  const conditionsContentRef = useRef<HTMLDivElement>(null);
+  const [conditionsStickyTop, setConditionsStickyTop] = useState<number | null>(null);
   const headerRef = useRef<HTMLElement>(null);
   const headerBottomRef = useRef(120);
   const [headerBottom, setHeaderBottom] = useState(120);
@@ -59,7 +56,12 @@ function HomePage() {
   const scheduleRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    const refs = [conditionsRef, processRef, evaluationRef, quoteRef, scheduleRef];
+    const measureConditions = () => {
+      const el = conditionsRef.current;
+      if (el) setConditionsStickyTop(window.innerHeight - el.offsetHeight);
+    };
+
+    const refs = [processRef, evaluationRef, quoteRef, scheduleRef];
     const update = () => {
       const hdr = headerRef.current;
       const hBottom = hdr ? hdr.offsetTop + hdr.offsetHeight : 120;
@@ -70,35 +72,20 @@ function HomePage() {
         if (!el) return;
         el.style.top = `${hBottom}px`;
       });
+      measureConditions();
     };
     update();
     window.addEventListener('resize', update);
 
-    const measureWrapper = () => {
-      const content = conditionsContentRef.current;
-      if (content) setConditionsWrapperHeight(content.offsetHeight);
-    };
-    measureWrapper();
-    const ro = new ResizeObserver(measureWrapper);
-    if (conditionsContentRef.current) ro.observe(conditionsContentRef.current);
-    // Also remeasure on image load (images shift layout after mount)
-    conditionsRef.current?.querySelectorAll('img').forEach(img => img.addEventListener('load', measureWrapper));
+    const ro = new ResizeObserver(measureConditions);
+    if (conditionsRef.current) ro.observe(conditionsRef.current);
+    conditionsRef.current?.querySelectorAll('img').forEach(img => img.addEventListener('load', measureConditions));
 
     const handleScroll = () => {
       const el = conditionsRef.current;
       if (!el) return;
       const rect = el.getBoundingClientRect();
-      const progress = Math.max(0, Math.min(1, (window.innerHeight - rect.top) / window.innerHeight));
-      setConditionsProgress(progress);
-
-      const sentinel = conditionsSentinelRef.current;
-      if (sentinel) {
-        const stickyTop = headerBottomRef.current;
-        const scrollPast = Math.max(0, stickyTop - sentinel.getBoundingClientRect().top);
-        const contentH = conditionsContentRef.current?.offsetHeight ?? el.scrollHeight;
-        const maxScroll = Math.max(0, contentH - el.offsetHeight);
-        setConditionsTranslateY(Math.min(scrollPast, maxScroll));
-      }
+      setConditionsProgress(Math.max(0, Math.min(1, (window.innerHeight - rect.top) / window.innerHeight)));
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
     handleScroll();
@@ -194,13 +181,13 @@ function HomePage() {
 
         <div className="relative z-10 bg-background">
         {version !== 3 ? (
-          <section className="bg-background mx-auto max-w-[1600px] px-6 pt-16 pb-20 sm:px-10 md:pt-24 md:pb-28 lg:px-16 text-center">
+          <section className="sticky z-[1] bg-background mx-auto max-w-[1600px] px-6 pt-16 pb-20 sm:px-10 md:pt-24 md:pb-28 lg:px-16 text-center" style={{ top: `${headerBottom}px` }}>
             <p className="font-display text-[clamp(1.6rem,4vw,3.5rem)] leading-[1.15] font-normal">Pain is personal.</p>
             <p className="font-display text-[clamp(1.6rem,4vw,3.5rem)] leading-[1.15] font-normal">Your care should be too.</p>
             <p className="font-display text-[clamp(1.6rem,4vw,3.5rem)] leading-[1.15] font-normal"><em className="text-primary">We start by listening.</em></p>
           </section>
         ) : (
-          <section className="bg-background mx-auto max-w-[1600px] px-6 pt-16 pb-20 sm:px-10 md:pt-24 md:pb-28 lg:px-16">
+          <section className="sticky z-[1] bg-background mx-auto max-w-[1600px] px-6 pt-16 pb-20 sm:px-10 md:pt-24 md:pb-28 lg:px-16" style={{ top: `${headerBottom}px` }}>
             <div className="grid gap-12 lg:grid-cols-2 lg:gap-20 lg:items-center">
               <div className="relative aspect-[3/4] max-h-[432px] w-full max-w-[324px] overflow-hidden rounded-[2rem] bg-secondary ml-[300px]">
                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-muted-foreground">
@@ -218,10 +205,7 @@ function HomePage() {
           </section>
         )}
 
-        <div className="mt-8" style={{ height: conditionsWrapperHeight > 0 ? `${conditionsWrapperHeight}px` : undefined }}>
-          <div ref={conditionsSentinelRef} />
-        <section ref={conditionsRef} id="conditions" className="sticky z-10 rounded-t-[2.5rem] overflow-hidden" style={{ backgroundColor: "#E8F2EB", height: `calc(100vh - ${headerBottom}px)` }}>
-          <div ref={conditionsContentRef} style={{ transform: `translateY(${-conditionsTranslateY}px)`, willChange: 'transform' }}>
+        <section ref={conditionsRef} id="conditions" className="sticky z-10 rounded-t-[2.5rem]" style={{ backgroundColor: "#E8F2EB", top: conditionsStickyTop !== null ? `${conditionsStickyTop}px` : undefined }}>
           <div className="mx-auto max-w-7xl px-6 py-16 lg:px-10 md:py-24">
             <div className="mb-12 flex flex-col justify-between gap-7 md:mb-16 md:flex-row md:items-end">
               <div><p className="mb-5 text-[11px] font-semibold uppercase text-kicker">01 — Who we help</p><h2 className="max-w-2xl font-display text-4xl leading-tight md:text-6xl" style={version === 1 ? { color: '#1D5B57' } : undefined}>Care that begins with<br /><em className="text-primary">your experience.</em></h2></div>
@@ -239,9 +223,7 @@ function HomePage() {
             </div>
             <div className="mt-14 grid gap-x-10 gap-y-12 md:mt-20 md:grid-cols-3">{otherConditions.map((item) => <a key={item.name} href="#evaluation" className="group block min-w-0"><div className="relative"><div className={`pointer-events-none absolute inset-0 z-10 translate-x-5 translate-y-5 border border-white/60 ${item.shape}`} /><div className={`aspect-[4/4.8] overflow-hidden bg-secondary ${item.shape}`}><img src={item.image} alt={item.alt} className="h-full w-full object-cover object-center transition-transform duration-700 group-hover:scale-105" /></div></div><div className="mt-6"><p className="font-display text-xl sm:text-2xl" style={version === 1 ? { color: '#1D5B57' } : undefined}>{item.name}</p><p className="mt-2 text-sm leading-6 text-muted-foreground">{item.detail}</p><p className="mt-3 text-xs font-semibold uppercase text-primary">Learn more</p></div></a>)}</div>
           </div>
-          </div>
         </section>
-        </div>
 
         <section ref={processRef} id="process" className="sticky z-20 scroll-mt-20 bg-secondary py-24 md:py-32">
           <div className="mx-auto max-w-7xl px-6 lg:px-10">
