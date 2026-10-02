@@ -4,8 +4,6 @@ import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 const heroImage = "/hero-1.jpeg";
 import backImage from "@/assets/renu-back-movement.jpg";
-import stretchImage from "@/assets/renu-gentle-stretch.jpg";
-import jointImage from "@/assets/renu-joint-movement.jpg";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -24,13 +22,13 @@ export const Route = createFileRoute("/")({
 
 const featuredConditions = [
   { name: "Back & spine pain", detail: "When pain keeps you from moving comfortably.", image: backImage, alt: "Person gently resting their hands against their lower back", shape: "rounded-t-[7rem] rounded-br-[7rem] rounded-bl-[1rem]" },
-  { name: "Neck pain & headaches", detail: "When tension and discomfort disrupt your day.", image: stretchImage, alt: "Person gently stretching their shoulder", shape: "rounded-tl-[7rem] rounded-tr-[1rem] rounded-b-[7rem]" },
-  { name: "Joint & arthritis pain", detail: "When everyday movement feels harder than it should.", image: jointImage, alt: "Hands resting gently on a bent knee", shape: "rounded-t-[7rem] rounded-br-[1rem] rounded-bl-[7rem]" },
+  { name: "Neck pain & headaches", detail: "When tension and discomfort disrupt your day.", image: "/renu-neck-older-woman.jpg", alt: "Woman holding her neck in discomfort", shape: "rounded-tl-[7rem] rounded-tr-[1rem] rounded-b-[7rem]" },
+  { name: "Joint & arthritis pain", detail: "When everyday movement feels harder than it should.", image: "/renu-joint-older-hands.jpg", alt: "Older hands resting on a knee", shape: "rounded-t-[7rem] rounded-br-[1rem] rounded-bl-[7rem]" },
 ];
 const otherConditions = [
-  { name: "Nerve pain & sciatica", detail: "Sharp, radiating pain that travels down your leg or arm.", image: stretchImage, alt: "Person gently stretching their shoulder", shape: "rounded-tl-[1rem] rounded-tr-[7rem] rounded-b-[7rem]" },
-  { name: "Sports & accident injuries", detail: "Pain from acute injuries that hasn't resolved with rest.", image: jointImage, alt: "Hands resting gently on a bent knee", shape: "rounded-t-[7rem] rounded-bl-[7rem] rounded-br-[1rem]" },
-  { name: "Pain after surgery", detail: "Post-surgical pain that lingers longer than expected.", image: backImage, alt: "Person gently resting their hands against their lower back", shape: "rounded-tl-[7rem] rounded-tr-[1rem] rounded-br-[7rem] rounded-bl-[1rem]" },
+  { name: "Nerve pain & sciatica", detail: "Sharp, radiating pain that travels down your leg or arm.", image: "/renu-nerve-man-stretch.jpg", alt: "Person holding their lower leg in pain", shape: "rounded-tl-[1rem] rounded-tr-[7rem] rounded-b-[7rem]" },
+  { name: "Sports & accident injuries", detail: "Pain from acute injuries that hasn't resolved with rest.", image: "/renu-sports-young-man.jpg", alt: "Young man holding his shoulder in pain", shape: "rounded-t-[7rem] rounded-bl-[7rem] rounded-br-[1rem]" },
+  { name: "Pain after surgery", detail: "Post-surgical pain that lingers longer than expected.", image: "/renu-sports-recovery.jpg", alt: "Person holding their arm during recovery", shape: "rounded-tl-[7rem] rounded-tr-[1rem] rounded-br-[7rem] rounded-bl-[1rem]" },
 ];
 const steps = [
   { number: "01", title: "Listen", detail: "Your full story comes first." },
@@ -41,9 +39,27 @@ const steps = [
   { number: "06", title: "Adjust", detail: "Refine the plan as you progress." },
 ];
 
+const heroSlides = [
+  {
+    image: heroImage,
+    imageAlt: "A wide field of green leaves in soft morning light",
+    kicker: "The right path out of pain",
+    heading: ["Advanced interventional care.", "A whole-person approach."],
+    body: "Dr. Razi and the ReNu Pain & Wellness team don't guess. They start with a thorough evaluation, identify the source, and build a plan that fits your life.",
+  },
+  {
+    image: "/hero-hands-tablet.jpg",
+    imageAlt: "Doctor reviewing a patient care plan on a tablet",
+    kicker: "Answers before treatment",
+    heading: ["Your pain, understood.", "Your plan, yours."],
+    body: "Every care decision at ReNu starts with clarity — a focused evaluation that identifies the source of your pain so the path forward makes sense.",
+  },
+];
+
 function HomePage() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [version, setVersion] = useState<1 | 2 | 3>(1);
+  const [heroSlide, setHeroSlide] = useState(0);
   const closeMenu = () => setMenuOpen(false);
   const conditionsRef = useRef<HTMLElement>(null);
   const [conditionsProgress, setConditionsProgress] = useState(0);
@@ -97,6 +113,12 @@ function HomePage() {
       ro.disconnect();
     };
   }, []);
+
+  useEffect(() => {
+    if (version !== 3) { setHeroSlide(0); return; }
+    const id = setInterval(() => setHeroSlide(s => (s + 1) % heroSlides.length), 6000);
+    return () => clearInterval(id);
+  }, [version]);
 
   return (
     <div className={`page-root min-h-screen bg-background text-foreground ${version !== 3 ? "overflow-hidden" : ""}`} data-theme={version >= 2 ? "v2" : undefined} data-version={version}>
@@ -153,29 +175,48 @@ function HomePage() {
         <div className={version === 3 ? "px-5" : "px-3 sm:px-6 lg:px-10"} style={version === 3 ? { position: 'sticky', top: 0, zIndex: 0 } : undefined}>
           <div className={`relative ${version === 3 ? "w-full" : "mx-auto max-w-[1600px]"}`}>
             {version !== 3 && <div className="pointer-events-none absolute inset-0 z-20 translate-x-5 translate-y-5 rounded-[2.5rem] rounded-tr-[1rem] border border-white/60 sm:rounded-[4rem] sm:rounded-tr-[1rem]" />}
-          <section className={`relative flex items-center overflow-hidden ${version === 3 ? "rounded-none" : "rounded-[2.5rem] rounded-tr-[1rem] min-h-[610px] sm:min-h-[660px] sm:rounded-[4rem] sm:rounded-tr-[1rem] lg:min-h-[690px]"}`} style={version === 3 ? { height: 'calc(100vh - 100px)', borderRadius: '10px' } : undefined}>
-            <img src={heroImage} alt="A wide field of green leaves in soft morning light" width={1920} height={1088} fetchPriority="high" className="absolute inset-0 h-full w-full object-cover object-center hero-ken-burns" />
-            <div className="hero-shade absolute inset-0" aria-hidden="true" />
-            <div className="relative z-10 w-full px-7 py-20 sm:px-12 lg:px-24">
-              <div className="max-w-[750px]">
-                <p className="mb-8 text-[16px] font-semibold uppercase text-kicker">The right path out of pain</p>
-                {version === 3 ? (
-                  <>
-                    <h1 className="font-display text-[clamp(1.6rem,4.5vw,4rem)] font-normal leading-[1.1] text-hero-foreground"><span className="block">Advanced interventional care. A whole-person approach.</span></h1>
-                    <p className="mt-8 max-w-[520px] text-base leading-relaxed text-hero-muted md:text-lg">Dr. Razi and the ReNu Pain & Wellness team don't guess. They start with a thorough evaluation, identify the source, and build a plan that fits your life.</p>
-                  </>
-                ) : (
-                  <>
-                    <h1 className="font-display text-[clamp(2rem,6.5vw,5.75rem)] font-normal leading-[1.06] text-hero-foreground"><span className="block whitespace-nowrap">Understand your pain.</span><em className="block font-normal text-primary">Find the right way forward.</em></h1>
-                    <p className="mt-8 max-w-[480px] text-base leading-relaxed text-hero-muted md:text-lg">Personalized pain care that starts with an accurate evaluation — so your next step feels clear, not uncertain.</p>
-                  </>
-                )}
-                <div className="mt-9 flex flex-wrap items-center gap-6">
-                  <Button asChild variant="hero" size="lg" className="h-14 rounded-full px-7 text-xs font-semibold uppercase"><a href="#schedule">Schedule a Pain Evaluation <ArrowUpRight /></a></Button>
+          <section className={`relative flex items-center overflow-hidden ${version === 3 ? "rounded-none" : "rounded-[2.5rem] rounded-tr-[1rem] min-h-[610px] sm:min-h-[660px] sm:rounded-[4rem] sm:rounded-tr-[1rem] lg:min-h-[690px]"}`} style={version === 3 ? { height: `calc(100vh - ${headerBottom}px - 20px)`, borderRadius: '10px' } : undefined}>
+            {version === 3 ? heroSlides.map((slide, i) => (
+              <img key={i} src={slide.image} alt={slide.imageAlt} className={`absolute inset-0 h-full w-full object-cover object-center transition-opacity duration-1000 ${heroSlide === i ? 'opacity-100' : 'opacity-0'}`} />
+            )) : (
+              <img src={heroImage} alt="A wide field of green leaves in soft morning light" width={1920} height={1088} fetchPriority="high" className="absolute inset-0 h-full w-full object-cover object-center hero-ken-burns" />
+            )}
+            <div className={`hero-shade absolute inset-0 transition-opacity duration-1000 ${version === 3 && heroSlide === 1 ? 'opacity-0' : 'opacity-100'}`} aria-hidden="true" />
+            {version === 3 ? heroSlides.map((slide, i) => (
+              <div key={i} className={`absolute inset-0 z-10 flex items-center px-7 sm:px-12 lg:px-24 transition-opacity duration-1000 ${heroSlide === i ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+                <div className="max-w-[750px]">
+                  <p className="mb-8 text-[16px] font-semibold uppercase text-kicker">{slide.kicker}</p>
+                  <h1 className="font-display text-[clamp(1.6rem,4.5vw,4rem)] font-normal leading-[1.1] text-hero-foreground">{slide.heading.map((line, li) => <span key={li} className="block">{line}</span>)}</h1>
+                  <p className="mt-8 max-w-[520px] text-base leading-relaxed text-hero-muted md:text-lg">{slide.body}</p>
+                  <div className="mt-9 flex flex-wrap items-center gap-6">
+                    <Button asChild variant="hero" size="lg" className="h-14 rounded-full px-7 text-xs font-semibold uppercase"><a href="#schedule">Schedule a Pain Evaluation <ArrowUpRight /></a></Button>
+                  </div>
                 </div>
               </div>
+            )) : (
+              <div className="relative z-10 w-full px-7 py-20 sm:px-12 lg:px-24">
+                <div className="max-w-[750px]">
+                  <p className="mb-8 text-[16px] font-semibold uppercase text-kicker">The right path out of pain</p>
+                  <h1 className="font-display text-[clamp(2rem,6.5vw,5.75rem)] font-normal leading-[1.06] text-hero-foreground"><span className="block whitespace-nowrap">Understand your pain.</span><em className="block font-normal text-primary">Find the right way forward.</em></h1>
+                  <p className="mt-8 max-w-[480px] text-base leading-relaxed text-hero-muted md:text-lg">Personalized pain care that starts with an accurate evaluation — so your next step feels clear, not uncertain.</p>
+                  <div className="mt-9 flex flex-wrap items-center gap-6">
+                    <Button asChild variant="hero" size="lg" className="h-14 rounded-full px-7 text-xs font-semibold uppercase"><a href="#schedule">Schedule a Pain Evaluation <ArrowUpRight /></a></Button>
+                  </div>
+                </div>
+              </div>
+            )}
+            <div className="absolute bottom-0 left-0 right-0 z-20 hidden px-12 py-7 text-[10px] font-semibold uppercase text-hero-muted sm:flex sm:justify-between lg:px-24">
+              <span>ReNu Pain & Wellness</span>
+              {version === 3 ? (
+                <div className="flex items-center gap-2">
+                  {heroSlides.map((_, i) => (
+                    <button key={i} onClick={() => setHeroSlide(i)} aria-label={`Slide ${i + 1}`} className={`rounded-full transition-all duration-300 ${heroSlide === i ? 'h-1.5 w-6 bg-white' : 'h-1.5 w-1.5 bg-white/40'}`} />
+                  ))}
+                </div>
+              ) : (
+                <span>Clarity before treatment</span>
+              )}
             </div>
-            <div className="absolute bottom-0 left-0 right-0 hidden px-12 py-7 text-[10px] font-semibold uppercase text-hero-muted sm:flex sm:justify-between lg:px-24"><span>ReNu Pain & Wellness</span><span>Clarity before treatment</span></div>
           </section>
           </div>
         </div>
